@@ -1,72 +1,120 @@
-import { CrossIcon } from "./components/icons/CrossIcon"
-import { MoonIcon } from "./components/icons/MoonIcon"
+import { useState } from "react"
+import CrearTarea from "./components/CrearTarea"
+import EstadoTareas from "./components/EstadoTareas"
+import FiltroTareas from "./components/FiltroTareas"
+import Header from "./components/Header"
+import ListaTareas from "./components/ListaTareas"
+
+//Se crea una lista estatica que puede tener mas tareas
+const initialStateTareas = [
+  {
+    id: 1,
+    title: 'Terminar la app Todo de FrontEnd Mentor',
+    complete: false,
+  },
+  {
+    id: 2,
+    title: 'Terminar el curso de JavaScript con Bluuweb',
+    complete: false,
+  },
+  {
+    id: 3,
+    title: 'Iniciar el curso de VueJS',
+    complete: false,
+  },
+  {
+    id: 4,
+    title: '10 minutos de React',
+    complete: false,
+  },
+  {
+    id: 5,
+    title: 'Reforzar conocimientos en JAVA',
+    complete: false,
+  },
+]
 
 function App() {
+  const [tareas, setTareas] = useState(initialStateTareas); //Se agrega al state las tareas predefinidas
+
+  //Esta funion permite crear una nueva tarea para ser agregada al state
+  const createTarea = title => {
+    //Crea un objeto de tarea
+    const newTarea = {
+      id: tareas.length + 1,
+      title: title.trim(),
+      complete: false,
+    }
+
+    //La nueva tarea se agrega a la collecion de tareas
+    setTareas([...tareas, newTarea]);
+  }
+
+  //Cuando una tarea fue finalizada
+  const updateTarea = (id) => {
+    //Recorrido por el arreglo, si el id de la tarea seleccionada coincide en uno del recorrido
+    //se hace copia del resto de los atribitos de la tarea pero se modifica el completado, en caso contrario solo devuelve 
+    //la tarea
+    setTareas(tareas.map(tarea => tarea.id === id ? {...tarea, complete: !tarea.complete} : tarea))
+  }
+
+  //Cuando se quiere eliminar una tarea
+  const removeTarea = (id) => {
+    setTareas(tareas.filter((tarea) => tarea.id !== id)); //Elimina la tarea que coincida con el id de la seleccioanda
+  }
+
+  //Monitoreo de tareas: total de todas las tareas
+  const computedTareas = tareas.filter(tarea => !tarea.complete).length
+
+  //Monitoreo: limpiar completadas
+  const cleanComplete = () => {
+    setTareas(tareas.filter(tarea => !tarea.complete)); //Toda tarea que este completada es eliminada por el filter
+  }
+
+  //Filtro: Todas las tareas 
+  const [filtro, setFiltro] = useState('todas'); //Se declara un nuevo state que tiene un string como indicador
+
+  const changeFiltro = filtro => setFiltro(filtro);
+
+  const filtrarTareas = () => {
+    switch (filtro) {
+      case 'todas': return tareas;
+      case 'pendientes': return tareas.filter(tarea => !tarea.complete);
+      case 'completadas': return tareas.filter(tarea => tarea.complete);
+      default: return tareas;
+    }
+  }
 
   return (
-    <>
-      <div className="bg-[url('./assets/images/bg-desktop-light.jpg')] 
+    <div className="bg-[url('./assets/images/bg-desktop-light.jpg')] 
                       bg-clip-border bg-no-repeat bg-gray-200 min-h-screen">
-          {/* El header contiene el titulo, boton de modo osucro/claro y agregar nueva tarea */}
-          <header className="container mx-auto px-4 pt-6">
-          <div className="flex justify-between">
-            <h1 className="uppercase text-2xl text-white font-bold tracking-[0.3em]">Todo</h1>
-            <button><MoonIcon className="fill-white"/></button>
-          </div>
-          
-          <form className="flex gap-4 items-center overflow-hidden bg-white rounded-md p-2 mt-4">
-            <span className="inline-block h-5 w-5 rounded-full border-2"></span>
-            <input 
-              type="text"
-              placeholder="Crear una nueva tarea"
-              className="w-full text-gray-400 outline-none"
-            />
-          </form>
-        </header>
+      {/* El header contiene el titulo, boton de modo osucro/claro*/}
+      <Header />
 
-        {/* Contendra todas las tareas y opciones auxiliares */}
-        <main className="container mx-auto px-4 mt-7">
-          <div className="bg-white rounded-md [&>article]:p-4">
-            <article className="flex gap-4 border-b-gray-300 border-b">
-              <buttton className="flex-none inline-block h-5 w-5 rounded-full border-2"></buttton>
-              <p className="text-gray-500 flex-grow text-center">Completa el curso completo de JavaScript en Bluuweb</p>
-              <button className="flex-none"><CrossIcon/></button>
-            </article>
-            <article className="flex gap-4 border-b-gray-300 border-b">
-              <buttton className="flex-none inline-block h-5 w-5 rounded-full border-2"></buttton>
-              <p className="text-gray-500 flex-grow text-center">Completa el curso completo de JavaScript en Bluuweb</p>
-              <button className="flex-none"><CrossIcon/></button>
-            </article>
-            <article className="flex gap-4 border-b-gray-300 border-b">
-              <buttton className="flex-none inline-block h-5 w-5 rounded-full border-2"></buttton>
-              <p className="text-gray-500 flex-grow text-center">Completa el curso completo de JavaScript en Bluuweb</p>
-              <button className="flex-none"><CrossIcon/></button>
-            </article>
+      {/* Contendra todas las tareas y crearlas */}
+      <main className="container mx-auto px-4 mt-7">
+        <CrearTarea createTarea={createTarea}/>
 
-            <section className="p-4 flex justify-between">
-              <span className="text-gray-400">5 items left</span>
-              <button className="text-gray-400">Limpiar completos</button>
-            </section>
-          </div>
-        </main>
+        {/* Listado de tareas*/}
+        <ListaTareas 
+            tareas={filtrarTareas()} 
+            updateTarea={updateTarea} 
+            removeTarea={removeTarea}
+        />
+
+        {/* Estado de tareas y operaciones */}
+        <EstadoTareas 
+            computedTareas={computedTareas}
+            cleanComplete={cleanComplete}
+        />
 
         {/* Filtro de tareas */}
-        <section className="container mx-auto px-4 mt-5">
-          <div className="bg-white p-4 rounded-md flex justify-center gap-8">
-            <button className="hover:text-blue-400">Todos</button>
-            <button className="hover:text-blue-400">Activo</button>
-            <button className="hover:text-blue-400">Completos</button>
-          </div>
-        </section>
+        <FiltroTareas filtro={filtro} changeFiltro={changeFiltro}/>
+      </main>
 
-        <section className="text-center mt-8">
-          <p>
-            Seleccionar y arrastrar para reordenar
-          </p>
-          <p>Proximamente xd</p>
-          </section>
-      </div>
-    </>
+      {/* Sugerencia sobre la aplicacion */}
+      <footer className="text-center mt-8"><p>Seleccionar y arrastrar para reordenar</p></footer>
+    </div>
   )
 }
 

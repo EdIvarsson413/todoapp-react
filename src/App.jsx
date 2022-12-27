@@ -1,41 +1,25 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import CrearTarea from "./components/CrearTarea"
 import EstadoTareas from "./components/EstadoTareas"
 import FiltroTareas from "./components/FiltroTareas"
 import Header from "./components/Header"
 import ListaTareas from "./components/ListaTareas"
 
-//Se crea una lista estatica que puede tener mas tareas
-const initialStateTareas = [
-  {
-    id: 1,
-    title: 'Terminar la app Todo de FrontEnd Mentor',
-    complete: false,
-  },
-  {
-    id: 2,
-    title: 'Terminar el curso de JavaScript con Bluuweb',
-    complete: false,
-  },
-  {
-    id: 3,
-    title: 'Iniciar el curso de VueJS',
-    complete: false,
-  },
-  {
-    id: 4,
-    title: '10 minutos de React',
-    complete: false,
-  },
-  {
-    id: 5,
-    title: 'Reforzar conocimientos en JAVA',
-    complete: false,
-  },
-]
+//Se cargan las tareas resguardadas en localStorage, si no hay tareas devuelve un nuevo arreglo
+//const initialStateTareas = JSON.parse(localStorage.getItem("tareas")) || [];
 
 function App() {
-  const [tareas, setTareas] = useState(initialStateTareas); //Se agrega al state las tareas predefinidas
+  const [tareas, setTareas] = useState([]); //Se agrega al state las tareas predefinidas
+
+  //localStorage para guardar las tareas
+  useEffect(() => {
+    localStorage.setItem('tareas', JSON.stringify(tareas))
+  }, [tareas])
+  
+  //Se cargan todas las tareas en localStorage y se cargan directamente al state, si no hay nada inicia un nuevo arreglo
+  useState(() => {
+    setTareas(JSON.parse(localStorage.getItem('pacientes')) ?? []) //Si no hay nada en LS se crea un arreglo vacio
+  })
 
   //Esta funion permite crear una nueva tarea para ser agregada al state
   const createTarea = title => {
@@ -86,13 +70,17 @@ function App() {
   }
 
   return (
-    <div className="bg-[url('./assets/images/bg-desktop-light.jpg')] 
-                      bg-clip-border bg-no-repeat bg-gray-200 min-h-screen">
+    <div className="bg-[url('./assets/images/bg-mobile-light.jpg')] 
+                    bg-clip-border bg-contain bg-no-repeat bg-gray-200 
+                    dark:bg-gray-900 min-h-screen dark:bg-[url('./assets/images/bg-mobile-dark.jpg')]
+                    dark:md:bg-[url('./assets/images/bg-desktop-dark.jpg')] 
+                    md:bg-[url('./assets/images/bg-desktop-light.jpg')]
+                    transition-all duration-500">
       {/* El header contiene el titulo, boton de modo osucro/claro*/}
       <Header />
 
       {/* Contendra todas las tareas y crearlas */}
-      <main className="container mx-auto px-4 mt-7">
+      <main className="container mx-auto px-4 mt-7 md:max-w-xl">
         <CrearTarea createTarea={createTarea}/>
 
         {/* Listado de tareas*/}
@@ -113,7 +101,9 @@ function App() {
       </main>
 
       {/* Sugerencia sobre la aplicacion */}
-      <footer className="text-center mt-8"><p>Seleccionar y arrastrar para reordenar</p></footer>
+      <footer className="text-center mt-8 dark:text-gray-400 transition-all duration-500">
+        <p>Seleccionar y arrastrar para reordenar</p>
+      </footer>
     </div>
   )
 }

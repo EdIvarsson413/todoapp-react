@@ -21,12 +21,13 @@ const CrearTarea = ({createTarea}) => {
     return (
       <form 
         onSubmit={handleSubmit} 
-        className="flex gap-4 items-center overflow-hidden bg-white rounded-md p-2 mt-4">
+        className="flex gap-4 items-center overflow-hidden bg-white dark:bg-gray-800 transition-all duration-500 
+                   rounded-md p-2 mt-4">
           <div className={`inline-block ml-2 h-5 w-5 rounded-full border-2 ${title && degradado}`}></div>
           <input
               type="text"
               placeholder="Crear una nueva tarea"
-              className="w-full text-gray-400 outline-none"
+              className="w-full text-gray-400 dark:bg-gray-800 dark:text-gray-300 transition-all duration-500 outline-none"
               value={title}
               onChange={e => setTitle(e.target.value)}
           />

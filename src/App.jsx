@@ -4,9 +4,15 @@ import EstadoTareas from "./components/EstadoTareas"
 import FiltroTareas from "./components/FiltroTareas"
 import Header from "./components/Header"
 import ListaTareas from "./components/ListaTareas"
+import { DragDropContext } from "@hello-pangea/dnd"
 
-//Se cargan las tareas resguardadas en localStorage, si no hay tareas devuelve un nuevo arreglo
-//const initialStateTareas = JSON.parse(localStorage.getItem("tareas")) || [];
+const reOrdenar = (listaIni, iniIndex, finIndex) => {
+  const copia = [...listaIni];
+  const [removed] = copia.splice(iniIndex, 1);
+  copia.splice(finIndex, 0, removed);
+
+  return copia;
+}
 
 function App() {
   const [tareas, setTareas] = useState([]); //Se agrega al state las tareas predefinidas
@@ -18,7 +24,7 @@ function App() {
   
   //Se cargan todas las tareas en localStorage y se cargan directamente al state, si no hay nada inicia un nuevo arreglo
   useState(() => {
-    setTareas(JSON.parse(localStorage.getItem('pacientes')) ?? []) //Si no hay nada en LS se crea un arreglo vacio
+    setTareas(JSON.parse(localStorage.getItem('tareas')) ?? []) //Si no hay nada en LS se crea un arreglo vacio
   })
 
   //Esta funion permite crear una nueva tarea para ser agregada al state
@@ -69,6 +75,22 @@ function App() {
     }
   }
 
+  //Ordenar los elementos drag n' drop
+  const handleDragEnd = result => {
+    const {destination, source} = result;
+
+    if(!destination) return;
+
+    if(
+        source.index === destination.index 
+        && 
+        source.droppableId === destination.droppableId
+      )
+        return ;
+
+    setTareas((prevTareas) => reOrdenar(prevTareas, source.index, destination.index))
+  }
+
   return (
     <div className="bg-[url('./assets/images/bg-mobile-light.jpg')] 
                     bg-clip-border bg-contain bg-no-repeat bg-gray-200 
@@ -84,11 +106,13 @@ function App() {
         <CrearTarea createTarea={createTarea}/>
 
         {/* Listado de tareas*/}
-        <ListaTareas 
-            tareas={filtrarTareas()} 
-            updateTarea={updateTarea} 
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <ListaTareas
+            tareas={filtrarTareas()}
+            updateTarea={updateTarea}
             removeTarea={removeTarea}
-        />
+          />
+        </DragDropContext>
 
         {/* Estado de tareas y operaciones */}
         <EstadoTareas 

@@ -106,13 +106,11 @@ function App() {
         <CrearTarea createTarea={createTarea}/>
 
         {/* Listado de tareas*/}
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <ListaTareas
-            tareas={filtrarTareas()}
-            updateTarea={updateTarea}
-            removeTarea={removeTarea}
-          />
-        </DragDropContext>
+        <ListaTareas
+          tareas={filtrarTareas()}
+          updateTarea={updateTarea}
+          removeTarea={removeTarea}
+        />
 
         {/* Estado de tareas y operaciones */}
         <EstadoTareas 
@@ -124,10 +122,10 @@ function App() {
         <FiltroTareas filtro={filtro} changeFiltro={changeFiltro}/>
       </main>
 
-      {/* Sugerencia sobre la aplicacion */}
+      {/* Sugerencia sobre la aplicacion
       <footer className="text-center mt-8 dark:text-gray-400 transition-all duration-500">
         <p>Seleccionar y arrastrar para reordenar</p>
-      </footer>
+      </footer> */}
     </div>
   )
 }

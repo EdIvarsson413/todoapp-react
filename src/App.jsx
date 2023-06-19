@@ -1,21 +1,35 @@
 import { useEffect, useState } from "react"
+import Modal from "react-modal"
 import CrearTarea from "./components/CrearTarea"
 import EstadoTareas from "./components/EstadoTareas"
 import FiltroTareas from "./components/FiltroTareas"
 import Header from "./components/Header"
 import ListaTareas from "./components/ListaTareas"
-import { DragDropContext } from "@hello-pangea/dnd"
+import VerTarea from './components/VerTarea'
 
-const reOrdenar = (listaIni, iniIndex, finIndex) => {
-  const copia = [...listaIni];
-  const [removed] = copia.splice(iniIndex, 1);
-  copia.splice(finIndex, 0, removed);
-
-  return copia;
+// Estilos del modal
+const estilosModal = {
+  content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: "translate(-50%, -50%)"
+  },
+  overlay: {
+    backgroundColor: 'rgba(40, 40, 40, 0.75)'
+  },
 }
 
+// Agregar modal
+Modal.setAppElement("#root"); // Se agrega al id del div principal de la app (Para Vite)|
+
 function App() {
-  const [tareas, setTareas] = useState([]); //Se agrega al state las tareas predefinidas
+  const [ tareas, setTareas ] = useState([]); // Se agrega al state las tareas predefinidas
+  const [ tarea,  setTarea ] = useState({}); // Se usará para mostrar la tarea en un modal
+  const [ modal, setModal ] = useState(false);
+  const [ creando, setCreando ] = useState(false);
 
   //localStorage para guardar las tareas
   useEffect(() => {
@@ -28,16 +42,10 @@ function App() {
   })
 
   //Esta funion permite crear una nueva tarea para ser agregada al state
-  const createTarea = title => {
-    //Crea un objeto de tarea
-    const newTarea = {
-      id: tareas.length + 1,
-      title: title.trim(),
-      complete: false,
-    }
-
+  const createTarea = nuevaTarea => {
     //La nueva tarea se agrega a la collecion de tareas
-    setTareas([...tareas, newTarea]);
+    setTareas([...tareas, nuevaTarea]);
+    setCreando( !creando );
   }
 
   //Cuando una tarea fue finalizada
@@ -75,22 +83,6 @@ function App() {
     }
   }
 
-  //Ordenar los elementos drag n' drop
-  const handleDragEnd = result => {
-    const {destination, source} = result;
-
-    if(!destination) return;
-
-    if(
-        source.index === destination.index 
-        && 
-        source.droppableId === destination.droppableId
-      )
-        return ;
-
-    setTareas((prevTareas) => reOrdenar(prevTareas, source.index, destination.index))
-  }
-
   return (
     <div className="bg-[url('./assets/images/bg-mobile-light.jpg')] 
                     bg-clip-border bg-contain bg-no-repeat bg-gray-200 
@@ -103,13 +95,16 @@ function App() {
 
       {/* Contendra todas las tareas y crearlas */}
       <main className="container mx-auto px-4 mt-7 md:max-w-xl">
-        <CrearTarea createTarea={createTarea}/>
+        <CrearTarea setModal={setModal} setCreando={setCreando}/>
 
         {/* Listado de tareas*/}
         <ListaTareas
           tareas={filtrarTareas()}
           updateTarea={updateTarea}
           removeTarea={removeTarea}
+          setTarea={setTarea}
+          setModal={setModal}
+          setCreando={setCreando}
         />
 
         {/* Estado de tareas y operaciones */}
@@ -121,6 +116,18 @@ function App() {
         {/* Filtro de tareas */}
         <FiltroTareas filtro={filtro} changeFiltro={changeFiltro}/>
       </main>
+
+      {/* Modal para mostrar el producto y pedir la cantidad */}
+      {
+        modal && (
+          <Modal
+            isOpen={modal}
+            style={estilosModal}
+          >
+            <VerTarea tarea={tarea} creando={creando} setModal={setModal} createTarea={createTarea}/>
+          </Modal>
+        )
+      }
 
       {/* Sugerencia sobre la aplicacion
       <footer className="text-center mt-8 dark:text-gray-400 transition-all duration-500">

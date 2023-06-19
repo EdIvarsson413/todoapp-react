@@ -1,9 +1,9 @@
 import React from 'react'
 
 const FiltroTareas = ({filtro ,changeFiltro}) => {
-  return (
-      <section className="container mx-auto mt-8">
-          <div className="bg-white dark:bg-gray-800 p-4 transition-all duration-500 rounded-md flex justify-center gap-8">
+return (
+    <section className="container mx-auto py-8">
+        <div className="bg-white dark:bg-gray-800 p-4 transition-all duration-500 rounded-md flex justify-center gap-8">
                 <button 
                     className={`${filtro === 'todas' ? 'text-blue-600': 'text-gray-400'}
                                 ${filtro === 'todas' && 'dark:text-white'}
@@ -25,9 +25,9 @@ const FiltroTareas = ({filtro ,changeFiltro}) => {
                     onClick={() => changeFiltro('completadas')}>
                         Completas
                 </button>
-          </div>
-      </section>
-  )
+        </div>
+    </section>
+)
 }
 
 export default FiltroTareas

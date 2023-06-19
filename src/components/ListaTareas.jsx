@@ -2,7 +2,9 @@ import TareaItem from './TareaItem'
 
 const ListaTareas = ( { tareas, updateTarea ,removeTarea, setTarea, setModal, setCreando } ) => {
   return (
-    <div className="bg-white overflow-hidden rounded-t-md [&>article]:p-4 mt-6">
+    <div className="bg-white dark:bg-gray-800 [&>article]:p-4 mt-6 h-96 hover:overflow-y-auto 
+                    overflow-hidden rounded-t-md"
+    >
       {
         tareas.map( tarea => (
           <TareaItem
